@@ -88,23 +88,28 @@ namespace OCTOBER.Server.Controllers.UD
         }
 
         [HttpGet]
-        [Route("Get/{SchoolID}/{SectionID}")]
-        public async Task<IActionResult> Get(int SchoolID)
+        [Route("Get/{SchoolID}/{SectionID}/{StudentID")]
+        public async Task<IActionResult> Get(int SchoolID, int SectionID, int StudentID)
         {
             try
             {
                 await _context.Database.BeginTransactionAsync();
 
-                SchoolDTO? result = await _context.Schools
+                EnrollmentDTO? result = await _context.Enrollments
                     .Where(x => x.SchoolId == SchoolID)
-                    .Select(sp => new SchoolDTO
+                    .Where(x => x.SectionId == SectionID)
+                    .Where(x => x.StudentId == StudentID)
+                    .Select(sp => new EnrollmentDTO
                     {
                         CreatedBy = sp.CreatedBy,
                         CreatedDate = sp.CreatedDate,
+                        EnrollDate = sp.EnrollDate,
+                        FinalGrade = sp.FinalGrade,
                         ModifiedBy = sp.ModifiedBy,
                         ModifiedDate = sp.ModifiedDate,
-                        SchoolId = sp.SchoolId,
-                        SchoolName = sp.SchoolName
+
+                        
+                        
                     })
                 .SingleAsync();
                 await _context.Database.RollbackTransactionAsync();
