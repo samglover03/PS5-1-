@@ -30,19 +30,20 @@ namespace OCTOBER.Server.Controllers.UD
         {
         }
 
+
         [HttpDelete]
         [Route("Delete/{Enrollment}")]
-        public async Task<IActionResult> Delete(int SchoolID)
+        public async Task<IActionResult> Delete(int StudentID)
         {
             try
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Schools.Where(x => x.SchoolId == SchoolID).FirstOrDefaultAsync();
+                var itm = await _context.Enrollments.Where(x => x.StudentId == StudentID).FirstOrDefaultAsync();
 
                 if (itm != null)
                 {
-                    _context.Schools.Remove(itm);
+                    _context.Enrollments.Remove(itm);
                 }
                 await _context.SaveChangesAsync();
                 await _context.Database.CommitTransactionAsync();
@@ -66,14 +67,17 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var result = await _context.Schools.Select(sp => new SchoolDTO
+                var result = await _context.Enrollments.Select(sp => new EnrollmentDTO
                 {
                     CreatedBy = sp.CreatedBy,
                     CreatedDate = sp.CreatedDate,
+                    EnrollDate = sp.EnrollDate,
+                    FinalGrade = sp.FinalGrade,
                     ModifiedBy = sp.ModifiedBy,
                     ModifiedDate = sp.ModifiedDate,
                     SchoolId = sp.SchoolId,
-                    SchoolName = sp.SchoolName
+                    SectionId = sp.SectionId,
+                    StudentId = sp.StudentId
                 })
                 .ToListAsync();
                 await _context.Database.RollbackTransactionAsync();
@@ -88,7 +92,7 @@ namespace OCTOBER.Server.Controllers.UD
         }
 
         [HttpGet]
-        [Route("Get/{SchoolID}/{SectionID}/{StudentID")]
+        [Route("Get/{SchoolID}/{SectionID}/{StudentID}")]
         public async Task<IActionResult> Get(int SchoolID, int SectionID, int StudentID)
         {
             try
@@ -107,9 +111,9 @@ namespace OCTOBER.Server.Controllers.UD
                         FinalGrade = sp.FinalGrade,
                         ModifiedBy = sp.ModifiedBy,
                         ModifiedDate = sp.ModifiedDate,
-
-                        
-                        
+                        SchoolId = sp.SchoolId,
+                        SectionId = sp.SectionId,
+                        StudentId = sp.StudentId
                     })
                 .SingleAsync();
                 await _context.Database.RollbackTransactionAsync();
@@ -123,26 +127,32 @@ namespace OCTOBER.Server.Controllers.UD
             }
         }
 
+        public Task<IActionResult> Get(int KeyVal)
+        {
+            throw new NotImplementedException();
+        }
+
         [HttpPost]
         [Route("Post")]
-
-        public async Task<IActionResult> Post([FromBody] SchoolDTO _SchoolDTO)
+        public async Task<IActionResult> Post([FromBody] EnrollmentDTO _EnrollmentDTO)
         {
             try
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Schools.Where(x => x.SchoolId == _SchoolDTO.SchoolId).FirstOrDefaultAsync();
+                var itm = await _context.Enrollments.Where(x => x.StudentId == _EnrollmentDTO.StudentId).FirstOrDefaultAsync();
 
                 if (itm == null)
                 {
-                    School s = new School
+                    Enrollment e = new Enrollment
                     {
 
-                        SchoolId = _SchoolDTO.SchoolId,
-                        SchoolName = _SchoolDTO.SchoolName
+                        StudentId = _EnrollmentDTO.StudentId,
+                        SectionId = _EnrollmentDTO.SectionId,
+                        EnrollDate = _EnrollmentDTO.EnrollDate,
+                        FinalGrade = _EnrollmentDTO.FinalGrade,
                     };
-                    _context.Schools.Add(s);
+                    _context.Enrollments.Add(e);
                     await _context.SaveChangesAsync();
                     await _context.Database.CommitTransactionAsync();
                 }
@@ -158,18 +168,20 @@ namespace OCTOBER.Server.Controllers.UD
 
         [HttpPut]
         [Route("Put")]
-        public async Task<IActionResult> Put([FromBody] SchoolDTO _SchoolDTO)
+        public async Task<IActionResult> Put([FromBody] EnrollmentDTO _EnrollmentDTO)
         {
 
             try
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Schools.Where(x => x.SchoolId == _SchoolDTO.SchoolId).FirstOrDefaultAsync();
+                var itm = await _context.Enrollments.Where(x => x.StudentId == _EnrollmentDTO.StudentId).FirstOrDefaultAsync();
 
-                itm.SchoolName = _SchoolDTO.SchoolName;
+                itm.SectionId = _EnrollmentDTO.SectionId;
+                itm.EnrollDate = _EnrollmentDTO.EnrollDate;
+                itm.FinalGrade = _EnrollmentDTO.FinalGrade;
 
-                _context.Schools.Update(itm);
+                _context.Enrollments.Update(itm);
                 await _context.SaveChangesAsync();
                 await _context.Database.CommitTransactionAsync();
 

@@ -109,7 +109,12 @@ namespace OCTOBER.Server.Controllers.UD
                     {
 
                         SectionId = _SectionDTO.SectionId,
-                        SectionNo = _SectionDTO.SectionNo
+                        SectionNo = _SectionDTO.SectionNo,
+                        CourseNo = _SectionDTO.CourseNo,
+                        StartDateTime = _SectionDTO.StartDateTime,
+                        Location = _SectionDTO.Location,
+                        InstructorId = _SectionDTO.InstructorId,
+                        Capacity = _SectionDTO.Capacity
                     };
                     _context.Sections.Add(s);
                     await _context.SaveChangesAsync();
@@ -136,6 +141,11 @@ namespace OCTOBER.Server.Controllers.UD
                 var itm = await _context.Sections.Where(x => x.SectionId == _SectionDTO.SectionId).FirstOrDefaultAsync();
 
                 itm.SectionNo = _SectionDTO.SectionNo;
+                itm.CourseNo = _SectionDTO.CourseNo;
+                itm.StartDateTime = _SectionDTO.StartDateTime;
+                itm.Location = _SectionDTO.Location;
+                itm.InstructorId = _SectionDTO.InstructorId;
+                itm.Capacity = _SectionDTO.Capacity;
 
                 _context.Sections.Update(itm);
                 await _context.SaveChangesAsync();
